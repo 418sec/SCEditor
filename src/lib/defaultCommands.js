@@ -7,11 +7,33 @@ import _tmpl from './templates.js';
 // causes a line break. In all other browsers it's collapsed.
 var IE_BR_FIX = IE_VER && IE_VER < 11;
 
+
+/**
+ * Fix for xss bugs 
+ */
+function sanitize(string) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  return string.replace(reg, (match)=>(map[match]));
+}
+
+
+
+
 /**
  * Fixes a bug in FF where it sometimes wraps
  * new lines in their own list item.
  * See issue #359
  */
+
+
 function fixFirefoxListBug(editor) {
 	// Only apply to Firefox as will break other browsers.
 	if ('mozHidden' in document) {
@@ -417,9 +439,9 @@ var defaultCmds = {
 							) +
 						'</tr>'
 					);
-
+                                  
 					html += '</table>';
-
+                                        html = sanitize(html);
 					editor.wysiwygEditorInsertHtml(html);
 					editor.closeDropDown(true);
 					e.preventDefault();
