@@ -13,21 +13,15 @@ var IE_BR_FIX = IE_VER && IE_VER < 11;
 /**
  * Fix for xss bugs 
  */
-function sanitize(string) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        "/": '&#x2F;',
-    };
-    const reg = /[&<>"'/]/ig;
-    return string.replace(reg, (match) => (map[match]));
+function escapeHTML (unsafe_str) {
+    return unsafe_str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;')
+      .replace(/\'/g, '&#39;')
+      .replace(/\//g, '&#x2F;')
 }
-
-
-
 
 /**
  * Fixes a bug in FF where it sometimes wraps
@@ -443,7 +437,7 @@ var defaultCmds = {
                     );
 
                     html += '</table>';
-                    html = sanitize(html);
+                    
                     editor.wysiwygEditorInsertHtml(html);
                     editor.closeDropDown(true);
                     e.preventDefault();
@@ -526,7 +520,7 @@ var defaultCmds = {
                     }
 
                     editor.wysiwygEditorInsertHtml(
-                        '<img' + attrs + ' src="' + url + '" />'
+                        '<img' + attrs + ' src="' + escapeHTML(url) + '" />'
                     );
                 }
             );
@@ -571,7 +565,7 @@ var defaultCmds = {
 
                     if (!editor.getRangeHelper().selectedHtml() || text) {
                         editor.wysiwygEditorInsertHtml(
-                            '<a href="' + 'mailto:' + email + '">' +
+                            '<a href="' + 'mailto:' + escapeHTML(email) + '">' +
                             (text || email) +
                             '</a>'
                         );
@@ -631,7 +625,7 @@ var defaultCmds = {
                     text = text || url;
 
                     editor.wysiwygEditorInsertHtml(
-                        '<a href="' + url + '">' + text + '</a>'
+                        '<a href="' + escapeHTML(url) + '">' + text + '</a>'
                     );
                 } else {
                     editor.execCommand('createlink', url);
